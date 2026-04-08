@@ -10,8 +10,8 @@ genes = pd.read_csv("DETECTED_GENES.csv", header=None, index_col=False)
 
 mode="light"
 
-population = ["DAM", "Old Homeostatic", "Transition", "Young Homeostatic"]
-treatment = ["AD", "EAE", "Aging"]
+population = ["Young Homeostatic", "Transition", "Old Homeostatic", "DAM"]
+treatment = ["Aging", "AD", "EAE"]
 
 uni_mean = -0.032989667
 uni_sd = 0.289933333
@@ -34,17 +34,17 @@ color_map = {
     'Old Homeostatic': "#afc75b",
     'Transition': "#b14646",
     'Young Homeostatic': "#4c3ec7",
-    'AD': "#b33ba9",
-    'EAE': "#4d26bb",
-    'Aging': "#53410F",
-    'Old Homeostatic AD': "#bb58da",
-    'DAM AD': "#4ecbeb",
-    'Old Homeostatic EAE': "#f088e7",
-    'DAM EAE': "#6d93e6",
-    'Old Homeostatic Aging': "#c65cdb",
-    'DAM Aging': "#4224ee",
-    'Transition Aging': "#eb25eb",
-    'Young Homeostatic Aging': "#9694f3"
+    'AD': "#be2424",
+    'EAE': "#1d8f23",
+    'Aging': "#301FC5",
+    'Old Homeostatic AD': "#DF3232",
+    'DAM AD': "#802222",
+    'Old Homeostatic EAE': "#418045",
+    'DAM EAE': "#134b0b",
+    'Old Homeostatic Aging': "#404be4",
+    'DAM Aging': "#321caf",
+    'Transition Aging': "#1e1164",
+    'Young Homeostatic Aging': "#05041b"
 }
 
 app_ui = ui.page_sidebar(
@@ -71,9 +71,9 @@ app_ui = ui.page_sidebar(
                 "treatment",
                 "Filter by Treatment",
                 {
+                    "Aging": "Aging",
                     "AD": "AD",
-                    "EAE": "EAE",
-                    "Aging": "Aging"
+                    "EAE": "EAE"
                 },
                 selected=treatment
             ),
@@ -85,8 +85,8 @@ app_ui = ui.page_sidebar(
                 "Filter by Population",
                 {
                     "Young Homeostatic": "Young Homeostatic",
-                    "Old Homeostatic": "Old Homeostatic",
                     "Transition": "Transition", 
+                    "Old Homeostatic": "Old Homeostatic",
                     "DAM": "DAM"
                 },
                 selected=population
@@ -203,7 +203,7 @@ def server(input: Inputs, output: Outputs, session: Session):
             ),
             yaxis_title = "RPKM",
             xaxis_title = "",
-            showlegend = False,
+            showlegend = True,
             paper_bgcolor = papercolor,
             plot_bgcolor = bgcolor,
             margin=dict(t=100)
@@ -280,12 +280,25 @@ def server(input: Inputs, output: Outputs, session: Session):
         fig.add_trace(go.Scatter(
             x = uni_x_values,
             y = uni_y_values,
-            mode='lines'
+            mode='lines',
+            showlegend=False
+        ))
+        fig.add_trace(go.Scatter(
+            x = [data["AGE_X"].iloc[0]],
+            y = [norm.pdf(data["AGE_X"].iloc[0], loc = uni_mean, scale = uni_sd)],
+            mode='markers',
+            name='Aging',
+            marker=dict(
+                size=10,
+                color='blue',
+                symbol='circle'
+            )
         ))
         fig.add_trace(go.Scatter(
             x = [data["AD_X"].iloc[0]],
             y = [norm.pdf(data["AD_X"].iloc[0], loc = uni_mean, scale = uni_sd)],
             mode='markers',
+            name='AD',
             marker=dict(
                 size=10,
                 color='red',
@@ -296,19 +309,10 @@ def server(input: Inputs, output: Outputs, session: Session):
             x = [data["EAE_X"].iloc[0]],
             y = [norm.pdf(data["EAE_X"].iloc[0], loc = uni_mean, scale = uni_sd)],
             mode='markers',
+            name='EAE',
             marker=dict(
                 size=10,
                 color='green',
-                symbol='circle'
-            )
-        ))
-        fig.add_trace(go.Scatter(
-            x = [data["AGE_X"].iloc[0]],
-            y = [norm.pdf(data["AGE_X"].iloc[0], loc = uni_mean, scale = uni_sd)],
-            mode='markers',
-            marker=dict(
-                size=10,
-                color='blue',
                 symbol='circle'
             )
         ))
@@ -325,7 +329,7 @@ def server(input: Inputs, output: Outputs, session: Session):
             ),
             yaxis_title = "",
             xaxis_title = "",
-            showlegend = False,
+            showlegend = True,
             paper_bgcolor = papercolor,
             plot_bgcolor = bgcolor,
             margin=dict(t=100)
