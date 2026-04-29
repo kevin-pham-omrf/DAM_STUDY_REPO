@@ -86,7 +86,7 @@ app_ui = ui.page_sidebar(
                 {
                     "Young Homeostatic": "Young Homeostatic",
                     "Transition": "Transition", 
-                    "(Old) Homeostatic": "Old Homeostatic",
+                    "Old Homeostatic": "Old Homeostatic",
                     "DAM": "DAM"
                 },
                 selected=population
