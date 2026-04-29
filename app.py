@@ -6,7 +6,7 @@ from scipy.stats import norm
 from shiny import App, Inputs, Outputs, Session, reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
-genes = pd.read_csv("DETECTED_GENES.csv", header=None, index_col=False)
+genes = pd.read_csv("DETECTED_GENES_v2.csv", header=None, index_col=False)
 
 mode="light"
 
