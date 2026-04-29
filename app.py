@@ -10,7 +10,7 @@ genes = pd.read_csv("DETECTED_GENES_v2.csv", header=None, index_col=False)
 
 mode="light"
 
-population = ["Young Homeostatic", "Transition", "Old Homeostatic", "DAM"]
+population = ["Young Homeostatic", "Transition", "Old Homeostatic", "Homeostatic", "DAM"]
 treatment = ["Aging", "AD", "EAE"]
 
 uni_mean = -0.032989667
@@ -37,9 +37,9 @@ color_map = {
     'AD': "#be2424",
     'EAE': "#1d8f23",
     'Aging': "#301FC5",
-    'Old Homeostatic AD': "#DF3232",
+    'Homeostatic AD': "#DF3232",
     'DAM AD': "#802222",
-    'Old Homeostatic EAE': "#418045",
+    'Homeostatic EAE': "#418045",
     'DAM EAE': "#134b0b",
     'Old Homeostatic Aging': "#404be4",
     'DAM Aging': "#321caf",
@@ -86,7 +86,7 @@ app_ui = ui.page_sidebar(
                 {
                     "Young Homeostatic": "Young Homeostatic",
                     "Transition": "Transition", 
-                    "Old Homeostatic": "Old Homeostatic",
+                    "(Old) Homeostatic": "Old Homeostatic",
                     "DAM": "DAM"
                 },
                 selected=population
@@ -137,17 +137,19 @@ def server(input: Inputs, output: Outputs, session: Session):
         data["Subtype"] = pd.Categorical(data["Subtype"], categories=population, ordered=True)
         data["Treatment"] = pd.Categorical(data["Treatment"], categories=treatment, ordered=True)
         sorted_data = data.sort_values(['Treatment', 'Subtype'])
+        selected_pops = list(input.population())
+        if "Old Homeostatic" in selected_pops: selected_pops.append("Homeostatic")
         match input.filter():
             case "1":
                 outputData = sorted_data.loc[sorted_data["Treatment"].isin(input.treatment()), ("Treatment", input.gene())]
                 outputData["GROUP"] = outputData["Treatment"]
                 return outputData
             case "2":
-                outputData = sorted_data.loc[sorted_data["Subtype"].isin(input.population()), ("Subtype", input.gene())]
+                outputData = sorted_data.loc[sorted_data["Subtype"].isin(selected_pops), ("Subtype", input.gene())]
                 outputData["GROUP"] = outputData["Subtype"]
                 return outputData
             case "3":
-                outputData = sorted_data.loc[sorted_data["Subtype"].isin(input.population()), ("Subtype", "Treatment", input.gene())]
+                outputData = sorted_data.loc[sorted_data["Subtype"].isin(selected_pops), ("Subtype", "Treatment", input.gene())]
                 outputData = outputData.loc[outputData["Treatment"].isin(input.treatment()), ]
                 outputData["GROUP"] = outputData["Subtype"].astype(str) + " " + outputData["Treatment"].astype(str)
                 return outputData
@@ -176,7 +178,6 @@ def server(input: Inputs, output: Outputs, session: Session):
             return
         fig = go.Figure()
         data = filtered_expr()
-
         if mode == "light":
             bgcolor = "#e4e4e4"
             fontcolor = "#000000"
