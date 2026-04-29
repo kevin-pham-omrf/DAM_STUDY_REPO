@@ -133,7 +133,7 @@ def server(input: Inputs, output: Outputs, session: Session):
     
     @reactive.Calc
     def filtered_expr() -> pd.DataFrame:
-        data = pq.read_table('ALL_RPKM_LABELED_TRANSPOSED.parquet', columns=["Treatment", "Subtype", input.gene()]).to_pandas()
+        data = pq.read_table('ALL_RPKM_LABELED_TRANSPOSED_v2.parquet', columns=["Treatment", "Subtype", input.gene()]).to_pandas()
         data["Subtype"] = pd.Categorical(data["Subtype"], categories=population, ordered=True)
         data["Treatment"] = pd.Categorical(data["Treatment"], categories=treatment, ordered=True)
         sorted_data = data.sort_values(['Treatment', 'Subtype'])
